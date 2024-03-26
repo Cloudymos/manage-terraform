@@ -35,14 +35,16 @@ case $1 in
         echo "## Starting $1. ##"
         terraform fmt
         terraform validate
-        terraform plan -var-file="tfvars/$ENV.tfvars" -out="$ENV.tfplan"
+        terraform plan 
+        # -var-file="tfvars/$ENV.tfvars" -out="$ENV.tfplan"
         duration=$SECONDS # stores the duration of the process in the 'duration' variable
         echo "## Took $duration seconds to execute $1. ##"
         ;;
     apply)
         SECONDS=0
         echo "## Starting $1. ##"
-        terraform apply -auto-approve "$ENV.tfplan"
+        terraform apply -auto-approve 
+        # "$ENV.tfplan"
         duration=$SECONDS # stores the duration of the process in the 'duration' variable
         echo "Took $duration seconds to execute $1."
         ;;
@@ -86,9 +88,11 @@ case $1 in
     import)
         echo "## Starting $1. ##"
         # Asks the user for the resource type and ID to import
-        read -p "Enter the resource type and ID to import (in the format <resource_type>.<resource_name> or -id=<resource_id>): " terraform_resource
+        read -p "Enter the resource type and ID to import (in the format <resource_type>.<resource_name> <id_console_resource>): " terraform_resource
         # Executes the 'terraform import' command with the provided resource and ID
         terraform import $terraform_resource
+        duration=$SECONDS # stores the duration of the process in the 'duration' variable
+        echo "## Took $duration seconds to execute $1."
         ;;
     find)
         echo "## Starting $1. ##"
@@ -96,20 +100,24 @@ case $1 in
         read -p "Enter the resource to find (in the format <resource_type>.<resource_name> or -id=<resource_id>): " resource_identifier
         # Executes the 'terraform state list' command with the provided resource identifier
         terraform state list $resource_identifier
+        duration=$SECONDS # stores the duration of the process in the 'duration' variable
+        echo "## Took $duration seconds to execute $1."
+        ;;
+    show_properties)
+        echo "## Starting $1. ##"
+        # Asks the user for the resource to find
+        read -p "Enter the resource to find (in the format <resource_type>.<resource_name> or -id=<resource_id>): " resource_identifier
+        # Executes the 'terraform state list' command with the provided resource identifier
+        terraform state show "$resource_identifier"
+        duration=$SECONDS # stores the duration of the process in the 'duration' variable
+        echo "## Took $duration seconds to execute $1."
         ;;
     output)
         echo "## Starting $1. ##"
         # Asks the user for the output name to retrieve, or leave blank to retrieve all outputs
         read -p "Enter the output name to retrieve (leave blank for all outputs): " output_name
-        if [ -z "$output_name" ]; then
-            # If no output name is provided, list all outputs
-            terraform output
-        else
-            # If an output name is provided, show the specified output
-            terraform output $output_name
-        fi
-        ;;
-    *)
-        echo "Error: Select a valid option."
+        terraform output $output_name
+        duration=$SECONDS # stores the duration of the process in the 'duration' variable
+        echo "## Took $duration seconds to execute $1."
         ;;
 esac
