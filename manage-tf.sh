@@ -13,7 +13,7 @@ echo ": :                                   |_|             |___| : :"
 echo ":.:.........................................................:.:"
         echo "Initial setup on bash: 'source deploy.sh config'"
         cho "## basic options - behaves the same as terraform but with steroids ##" 
-        echo $0 "( init | plan | apply | destroy | fmt )"
+        echo $0 "( init | plan | apply | destroy | fmt | import | find | show_properties | output)"
         echo "## custom options ##"
         echo $0 "( clean | go | goodbye )"
         exit 1
