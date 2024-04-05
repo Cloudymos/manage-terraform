@@ -13,13 +13,11 @@ echo ": :                                   |_|             |___| : :"
 echo ":.:.........................................................:.:"
         echo "Initial setup on bash: 'source deploy.sh config'"
         cho "## basic options - behaves the same as terraform but with steroids ##" 
-        echo $0 "( init | plan | apply | destroy | fmt )"
+        echo $0 "( init | plan | apply | destroy | fmt | import | find | show_properties | output)"
         echo "## custom options ##"
         echo $0 "( clean | go | goodbye )"
         exit 1
 fi 
-
-#implementar um ambiente pos config pra não precisar entrar no script e trocar o ENV toda vez
 
 
 case $1 in
@@ -28,9 +26,7 @@ case $1 in
         export TF_LOG=error                                             # set debug level on your logs valid options [TRACE , DEBUG , INFO , WARN or ERROR]
         export TF_LOG_PATH=./terraform.log                              # create a log file for your to troubleshoot, change according to your needs
         export TF_PLUGIN_CACHE_DIR="$APPDATA/terraform.d/plugin-cache"  # plugins cache dir
-        export TF_VAR_repo=`echo "${PWD##*/}"`                          # configura nome do repositório de origem
-        #export ENV="your_env"                                           # sets the env youre working, really depends on your tfvars structure - recommended to put everything inside tfvars/env.tfvars
-        #export TF_WORKSPACE=your_workspace
+        #export TF_VAR_repo=`echo "${PWD##*/}"`                          # configura nome do repositório de origem                                         # sets the env youre working, really depends on your tfvars structure - recommended to put everything inside tfvars/env.tfvars
         echo '## setup done ##'
         ;; 
     fmt)
@@ -53,39 +49,64 @@ case $1 in
         echo "## Starting $1. ##"
         terraform fmt
         terraform validate
-        terraform plan 
-        # -var-file="tfvars/$ENV.tfvars" -out="$ENV.tfplan"
+        tfvars_files=$(find . -maxdepth 1 -name "*.tfvars" -print -quit)
+        if [ -z "$tfvars_files" ]; then
+            terraform plan
+        else
+            terraform plan -var-file="$tfvars_files"
+        fi
         duration=$SECONDS 
         echo "## Took $duration seconds to execute $1. ##"
         ;;
     apply)
         SECONDS=0
         echo "## Starting $1. ##"
-        terraform apply -auto-approve 
-        # "$ENV.tfplan"
+        tfvars_files=$(find . -maxdepth 1 -name "*.tfvars" -print -quit)
+        if [ -z "$tfvars_files" ]; then
+            terraform apply -auto-approve
+        else
+            terraform apply -auto-approve -var-file="$tfvars_files"
+        fi
         duration=$SECONDS 
         echo "Took $duration seconds to execute $1."
         ;;
     go)
         SECONDS=0
         echo "## Starting $1. ##"
-        terraform plan -var-file="tfvars/$ENV.tfvars" -out="$ENV.tfplan"
-        terraform apply -auto-approve "$ENV.tfplan"
+        tfvars_files=$(find . -maxdepth 1 -name "*.tfvars" -print -quit)
+        if [ -z "$tfvars_files" ]; then
+            terraform plan
+            terraform apply -auto-approve
+        else
+            terraform plan -var-file="$tfvars_files"
+            terraform apply -auto-approve -var-file="$tfvars_files"
+        fi
         duration=$SECONDS 
         echo "Took $duration seconds to execute $1."
         ;;
     goodbye)
         SECONDS=0
         echo "## Starting $1. ##"
-        terraform plan -var-file="tfvars/$ENV.tfvars" -out="$ENV.tfplan"
-        terraform destroy -auto-approve "$ENV.tfplan"
+        tfvars_files=$(find . -maxdepth 1 -name "*.tfvars" -print -quit)
+        if [ -z "$tfvars_files" ]; then
+            terraform plan
+            terraform destroy -auto-approve
+        else
+            terraform plan -var-file="$tfvars_files"
+            terraform destroy -auto-approve -var-file="$tfvars_files"
+        fi
         duration=$SECONDS 
         echo "Took $duration seconds to execute $1."
         ;;
     destroy)
         SECONDS=0
         echo "## Executing $1. ##"
-        terraform destroy -auto-approve -var-file="tfvars/$ENV.tfvars"
+        tfvars_files=$(find . -maxdepth 1 -name "*.tfvars" -print -quit)
+        if [ -z "$tfvars_files" ]; then
+            terraform destroy -auto-approve
+        else
+            terraform destroy -auto-approve -var-file="$tfvars_files"
+        fi
         duration=$SECONDS 
         echo "## Took $duration seconds to execute $1."
         ;;
