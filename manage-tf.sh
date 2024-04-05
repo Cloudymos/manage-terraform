@@ -19,8 +19,6 @@ echo ":.:.........................................................:.:"
         exit 1
 fi 
 
-#implementar um ambiente pos config pra não precisar entrar no script e trocar o ENV toda vez
-
 
 case $1 in
 
