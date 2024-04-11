@@ -1,4 +1,4 @@
-# manage-terraform
+# terradeploy
 A Bash utility to automate common tasks when working with Terraform, including formatting, initialization, planning, applying, destroying, and cleaning resources. **For additional resources, examples, and community engagement**, check out the portal [Cloudymos](https://cloudymos.com) :cloud:.
 
 ## Prerequisites
@@ -11,7 +11,7 @@ A Bash utility to automate common tasks when working with Terraform, including f
 Make sure to run the script with appropriate options as listed below:
 
 ```
-./manage-tf.sh
+./terradeploy.sh
 ``` 
 
 
